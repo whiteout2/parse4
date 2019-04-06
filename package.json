@@ -1,0 +1,11 @@
+{
+    "name": "parse4",
+    "displayName": "Parse4",
+    "description": "Parse Intel x86 instruction reference using TypeScript (standalone)",
+    "version": "0.1.0",
+    "publisher": "whiteout2",
+    "devDependencies": {
+        "ts-node": "^8.0.3",
+        "typescript": "^3.4.2"
+    }
+}
