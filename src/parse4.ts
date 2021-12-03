@@ -187,9 +187,16 @@ request.get('https://www.felixcloutier.com/x86/index.html', function (error, res
 
 
 
-// Poached from the X86 extension
+// Poached from the x86 vscode extension
 // We will use it here to get all the files
-function viewInstruction(moduleName, moduleLink)
+// TODO: It is better to prepackage our x86 vscode extension with all these files for if Intel 
+// changes its instructions and Felix updates the site then our extension still keeps working.
+// Also keeps things working when his site is offline.
+// NOTE: this function turns : in filenames into _ but index.html still links to them with :
+// and therefore the links do not work. Felix has kept the : because they work fine on Unix.
+// For Windows and Mac _ is better. When we use the local files in /x86 we have to make sure to
+// use the name with _ instead of : when the user clicks on an item in the views.
+function viewInstruction(moduleName: string, moduleLink: string)
 {
 	console.log("Item clicked: ", moduleName);
 
@@ -244,3 +251,5 @@ function viewInstruction(moduleName, moduleLink)
 	}); // End: request.get()
 
 }
+
+

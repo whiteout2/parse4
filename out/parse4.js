@@ -184,8 +184,11 @@ request.get('https://www.felixcloutier.com/x86/index.html', function (error, res
 // NOTE: cannot do this here: logtext will still be empty at this point because
 // the callback has just started
 //fs.writeFileSync('log.txt', logtext);
-// Poached from the X86 extension
+// Poached from the x86 vscode extension
 // We will use it here to get all the files
+// TODO: It is better to prepackage our x86 vscode extension with all these files for if Intel 
+// changes its instructions and Felix updates the site then our extension keeps working.
+// Also keeps things working when his site is offline.
 function viewInstruction(moduleName, moduleLink) {
     console.log("Item clicked: ", moduleName);
     // TODO: 
