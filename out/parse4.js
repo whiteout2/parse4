@@ -1,9 +1,21 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -80,6 +92,17 @@ request.get('https://www.felixcloutier.com/x86/index.html', function (error, res
         fs.writeFileSync(myExtDir + '/x86/index.html', body);
         */
         fs.writeFileSync('index.html', body);
+        // TODO: Get entire website in /x86 dir
+        // SHIT: The fucker is not compiling!!!!
+        // First: tsc was not installed: npm install -g typescript
+        // But still not working...
+        // YESS: we were working on a duplicate of this file in a /bin folder
+        // We deleted this folder. Works now!!!
+        //console.log("QQQ");
+        if (!fs.existsSync('./x86')) {
+            fs.mkdirSync('./x86');
+        }
+        fs.writeFileSync('./x86/index.html', body);
         // TODO: Parse <a href></a> as some mnemonics are grouped together on one page
         // Parse html file
         // NOTE: fucks up with: (1)</td>
@@ -123,6 +146,8 @@ request.get('https://www.felixcloutier.com/x86/index.html', function (error, res
                         console.log(summary);
                         console.log("");
                         logtext += mnemonic + '\n' + summary + '\n\n';
+                        // download
+                        viewInstruction(mnemonic, link);
                         // Add found mnemonic-summary to array
                         // HELL: The array gets never filled
                         // It's like all variables are deleted once we go out of request.get() scope
@@ -159,4 +184,51 @@ request.get('https://www.felixcloutier.com/x86/index.html', function (error, res
 // NOTE: cannot do this here: logtext will still be empty at this point because
 // the callback has just started
 //fs.writeFileSync('log.txt', logtext);
+// Poached from the X86 extension
+// We will use it here to get all the files
+function viewInstruction(moduleName, moduleLink) {
+    console.log("Item clicked: ", moduleName);
+    // TODO: 
+    // - Check if file is already in /x86 cache to skip the download (not really necessary)
+    // - Get rid of hardcoded /Users/RG/Documents/comp/whiteout2/tree-view-sample-x86/
+    //var myExtDir = vscode.extensions.getExtension ("whiteout2.x86").extensionPath;
+    var request = require('request');
+    request.get(`https://www.felixcloutier.com/x86/${moduleLink}`, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            // strip <header></header>
+            var body1 = body.slice(0, body.indexOf('<header>'));
+            var body2 = body.slice(body.indexOf('</header>') + 9, body.length);
+            body = body1 + body2;
+            // NOTE: Some html files have : in their names. Mac turns them to /
+            // Windows refuses to write them.
+            // NOTE2: When there is a file with / in the name in the /x86 directory and we publish
+            // the package, it won't install on Windows. Also, when we empty the /x86 directory 
+            // before publication to remedy this, the extension won't work because empty directories
+            // won't be packaged/published and the /x86 dir is needed.
+            // TODO: Change all : into _
+            // DONE:
+            var regex = /:/gi;
+            var cleanFileName = moduleLink.replace(regex, '_');
+            // TODO: Extra check that /x86 dir exists, if not create it. But we should already
+            // have created it when extension installs
+            // DONE:
+            // if (!fs.existsSync(myExtDir + `/x86`)) {
+            // 	fs.mkdirSync(myExtDir + `/x86`);
+            // }
+            // fs.writeFileSync(myExtDir + `/x86/${cleanFileName}`, body);
+            fs.writeFileSync(`./x86/${cleanFileName}`, body);
+            // TODO: previewHtml is deprecated, use Webview API
+            //vscode.commands.executeCommand('vscode.previewHtml', vscode.Uri.parse(`file://` + myExtDir + `/x86/${moduleLink}`), 1, `${moduleName}`);
+            // Create and show panel
+            // const panel = vscode.window.createWebviewPanel(
+            // 	'catCoding',
+            // 	`${moduleName}`,
+            // 	vscode.ViewColumn.One,
+            // 	{}
+            // );
+            // And set its HTML content
+            //panel.webview.html = body;
+        }
+    }); // End: request.get()
+}
 //# sourceMappingURL=parse4.js.map
